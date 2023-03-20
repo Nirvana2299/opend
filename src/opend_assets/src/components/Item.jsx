@@ -15,6 +15,7 @@ function Item(props) {
   const [priceInput, setPriceInput] = useState();
   const [hidden, setHidden] = useState(true);
   const [blur, setBlur] = useState();
+  const [sellStatus, setSellStatus] = useState("");
 
   const id = props.id;
   const localHost = `http://localhost:8080`;
@@ -43,6 +44,7 @@ function Item(props) {
     const nftIsListed = await opend.isListed(props.id)
     if (nftIsListed) {
       setOwner(`OpenD`);
+      setSellStatus(`Listed`)
       setBlur({ filter: `blur(4px)` })
     } else {
       setButton(<Button handleClick={handleSell} text={"Sell"} />)
@@ -84,8 +86,8 @@ function Item(props) {
         setButton();
         setPriceInput();
         setOwner(`OpenD`);
+        setSellStatus(`Listed`)
         setBlur({ filter: "blur(4px)" });
-
       }
     }
   }
@@ -108,7 +110,7 @@ function Item(props) {
         <div className="disCardContent-root">
           <h2 className="disTypography-root makeStyles-bodyText-24 disTypography-h5 disTypography-gutterBottom">
             {name}
-            <span className="purple-text"></span>
+            <span className="purple-text"> {sellStatus}</span>
           </h2>
           <p className="disTypography-root makeStyles-bodyText-24 disTypography-body2 disTypography-colorTextSecondary">
             Owner: {owner}

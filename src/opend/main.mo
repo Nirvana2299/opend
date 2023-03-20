@@ -66,10 +66,14 @@ actor OpenD {
                 itemPrice = price;
             };
             mapOfListings.put(id, newListing);
-            return "success";
+            return "Success";
         } else {
             return "You own this NFT";
         };
 
+    };
+
+    public query func getOpenDCanisterID() : async Principal {
+        return Principal.fromActor(OpenD)
     };
 };

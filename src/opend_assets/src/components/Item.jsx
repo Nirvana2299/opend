@@ -4,6 +4,7 @@ import { Actor, HttpAgent } from "@dfinity/agent";
 import { idlFactory } from "./../../../declarations/nft"
 import { Principal } from "@dfinity/principal"
 import Button from "./Button";
+import { opend } from "../../../declarations/opend";
 
 function Item(props) {
 
@@ -16,9 +17,11 @@ function Item(props) {
   const id = props.id;
   const localHost = `http://localhost:8080`;
   const agent = new HttpAgent({ host: localHost });
+  agent.fetchRootKey();
+  let NFTActor;
 
   const loadNFT = async () => {
-    const NFTActor = await Actor.createActor(idlFactory, {
+    NFTActor = await Actor.createActor(idlFactory, {
       agent,
       canisterId: id
     });
@@ -35,27 +38,38 @@ function Item(props) {
     setOwner(owner.toText());
     setImage(image)
 
-    setButton(<Button handleClick={handleSell} text={"Sell"}/>)
+    setButton(<Button handleClick={handleSell} text={"Sell"} />)
   }
 
   useEffect(() => { loadNFT(); }, []);
+
+  
 
   let price;
   const handleSell = () => {
     console.log(`sell clicked`);
     setPriceInput(
-    <input
-      placeholder="Price in DANG"
-      type="number"
-      className="price-input"
-      value={price }
-      onChange={e => (price = e.target.value) }
-    />
+      <input
+        placeholder="Price in DANG"
+        type="number"
+        className="price-input"
+        value={price}
+        onChange={e => (price = e.target.value)}
+      />
     );
     setButton(<Button handleClick={sellItem} text={"Confirm"} />)
   }
 
-  const sellItem = async () => console.log(`set price = ${price}`);
+  const sellItem = async () => {
+    console.log(`set price = ${price}`);
+    const listingResult = await opend.listItem(props.id, parseInt(price));
+    console.log(`listing: ${listingResult}`);
+    if (listingResult == "Success") {
+      const openDId = await opend.getOpenDCanisterID();
+      const transferResults = await NFTActor.transferOwnership(openDId, true);
+      console.log(`Transfer: ${transferResults}`);
+    }
+  }
 
 
   return (

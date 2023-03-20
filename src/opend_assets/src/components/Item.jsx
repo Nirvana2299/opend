@@ -5,6 +5,8 @@ import { idlFactory } from "./../../../declarations/nft"
 import { Principal } from "@dfinity/principal"
 import Button from "./Button";
 import { opend } from "../../../declarations/opend";
+import CURRENT_USER_ID from "../index";
+import PriceLabel from "./PriceLabel";
 
 function Item(props) {
 
@@ -16,6 +18,7 @@ function Item(props) {
   const [hidden, setHidden] = useState(true);
   const [blur, setBlur] = useState();
   const [sellStatus, setSellStatus] = useState("");
+  const [priceLabel, setPriceLabel] = useState()
 
   const id = props.id;
   const localHost = `http://localhost:8080`;
@@ -41,16 +44,24 @@ function Item(props) {
     setOwner(owner.toText());
     setImage(image)
 
-    const nftIsListed = await opend.isListed(props.id)
-    if (nftIsListed) {
-      setOwner(`OpenD`);
-      setSellStatus(`Listed`)
-      setBlur({ filter: `blur(4px)` })
-    } else {
-      setButton(<Button handleClick={handleSell} text={"Sell"} />)
+    if (props.role == "collection") {
+      const nftIsListed = await opend.isListed(props.id)
+      if (nftIsListed) {
+        setOwner(`OpenD`);
+        setSellStatus(`Listed`)
+        setBlur({ filter: `blur(4px)` })
+      } else {
+        setButton(<Button handleClick={handleSell} text={"Sell"} />)
+      }
+    } else if (props.role == "discover") {
+      const originalOwner = await opend.getOriginalOwner(props.id);
+      if (originalOwner.toText() != CURRENT_USER_ID.toText()) {
+        setButton(<Button handleClick={handleBuy} text={"Buy"} />);
+      }
+      const price = await opend.getListedNFTPrice(props.id);
+      setPriceLabel(<PriceLabel sellPrice={price.toString()} />)
     }
   }
-
   useEffect(() => { loadNFT(); }, []);
 
 
@@ -92,6 +103,10 @@ function Item(props) {
     }
   }
 
+  const handleBuy = async () => {
+    console.log("Clicked buy button")
+  }
+
 
   return (
     <div className="disGrid-item">
@@ -108,6 +123,7 @@ function Item(props) {
           <div></div>
         </div>
         <div className="disCardContent-root">
+          {priceLabel}
           <h2 className="disTypography-root makeStyles-bodyText-24 disTypography-h5 disTypography-gutterBottom">
             {name}
             <span className="purple-text"> {sellStatus}</span>

@@ -74,6 +74,14 @@ actor OpenD {
     };
 
     public query func getOpenDCanisterID() : async Principal {
-        return Principal.fromActor(OpenD)
+        return Principal.fromActor(OpenD);
     };
+
+    public query func isListed(id: Principal) : async Bool {
+        if (mapOfListings.get(id) == null) {
+            return false;
+        } else {
+            return true;
+        };
+    }; 
 };

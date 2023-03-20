@@ -13,6 +13,8 @@ function Item(props) {
   const [image, setImage] = useState();
   const [button, setButton] = useState();
   const [priceInput, setPriceInput] = useState();
+  const [hidden, setHidden] = useState(true);
+  const [blur, setBlur] = useState();
 
   const id = props.id;
   const localHost = `http://localhost:8080`;
@@ -43,10 +45,11 @@ function Item(props) {
 
   useEffect(() => { loadNFT(); }, []);
 
-  
+
 
   let price;
   const handleSell = () => {
+    
     console.log(`sell clicked`);
     setPriceInput(
       <input
@@ -61,6 +64,8 @@ function Item(props) {
   }
 
   const sellItem = async () => {
+    
+    setHidden(false)
     console.log(`set price = ${price}`);
     const listingResult = await opend.listItem(props.id, parseInt(price));
     console.log(`listing: ${listingResult}`);
@@ -68,6 +73,14 @@ function Item(props) {
       const openDId = await opend.getOpenDCanisterID();
       const transferResults = await NFTActor.transferOwnership(openDId, true);
       console.log(`Transfer: ${transferResults}`);
+      if (transferResults == "Success") {
+        setHidden(true);
+        setButton();
+        setPriceInput();
+        setOwner(`OpenD`);
+        setBlur({filter: "blur(4px)"});
+
+      }
     }
   }
 
@@ -78,7 +91,14 @@ function Item(props) {
         <img
           className="disCardMedia-root makeStyles-image-19 disCardMedia-media disCardMedia-img"
           src={image}
+          style={blur}
         />
+        <div className="lds-ellipsis" hidden={hidden}>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
         <div className="disCardContent-root">
           <h2 className="disTypography-root makeStyles-bodyText-24 disTypography-h5 disTypography-gutterBottom">
             {name}

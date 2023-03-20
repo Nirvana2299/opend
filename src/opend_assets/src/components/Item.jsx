@@ -40,7 +40,13 @@ function Item(props) {
     setOwner(owner.toText());
     setImage(image)
 
-    setButton(<Button handleClick={handleSell} text={"Sell"} />)
+    const nftIsListed = await opend.isListed(props.id)
+    if (nftIsListed) {
+      setOwner(`OpenD`);
+      setBlur({ filter: `blur(4px)` })
+    } else {
+      setButton(<Button handleClick={handleSell} text={"Sell"} />)
+    }
   }
 
   useEffect(() => { loadNFT(); }, []);
@@ -49,7 +55,7 @@ function Item(props) {
 
   let price;
   const handleSell = () => {
-    
+
     console.log(`sell clicked`);
     setPriceInput(
       <input
@@ -64,7 +70,7 @@ function Item(props) {
   }
 
   const sellItem = async () => {
-    
+
     setHidden(false)
     console.log(`set price = ${price}`);
     const listingResult = await opend.listItem(props.id, parseInt(price));
@@ -78,7 +84,7 @@ function Item(props) {
         setButton();
         setPriceInput();
         setOwner(`OpenD`);
-        setBlur({filter: "blur(4px)"});
+        setBlur({ filter: "blur(4px)" });
 
       }
     }

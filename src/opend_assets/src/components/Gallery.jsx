@@ -7,7 +7,7 @@ function Gallery(props) {
   const [items, setItems] = useState();
 
   const fetchNFTs = () => {
-    props.ids != undefined && setItems(props.ids.map(NFTId => <Item id={NFTId} key={NFTId.toText()} />))
+    props.ids != undefined && setItems(props.ids.map(NFTId => <Item id={NFTId} key={NFTId.toText()} role={props.role} />))
   };
 
   useEffect(() => { fetchNFTs(); }, [])
